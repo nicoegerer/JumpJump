@@ -14,7 +14,7 @@ void death(Character &player, int windowWidth, int windowHeight)
     if (!isDead)
     {
         deathStartTime = GetTime();
-        isDead = true;         
+        isDead = true;
     }
 
     DrawText("Tot!", windowWidth / 2 - 100, windowHeight / 2, 100, RED);
@@ -43,11 +43,10 @@ void LandOnPlatform(Character &player, Rectangle platform)
         10};
     DrawRectangleLinesEx(playerCollisionRec, 1, RED);
     DrawRectangleLinesEx(platform, 1, RED);
-    
     if (CheckCollisionRecs(playerCollisionRec, platform))
     {
-        bool fallingDown = player.velocity > 0;
-        bool abovePlatform = (player.posY + player.spriteHeight * player.scale - player.velocity) <= platform.y;
+        bool fallingDown = player.velocity < 0;
+        bool abovePlatform = (player.posY + player.spriteHeight * player.scale + player.velocity) <= platform.y;
         if (fallingDown && abovePlatform)
         {
             player.isJumping = false;
@@ -57,19 +56,23 @@ void LandOnPlatform(Character &player, Rectangle platform)
     }
 }
 
-void BackgroundScroll(Character &player, Background &background, Platform* platforms[], int numPlatforms, Platform &platform) {
+void BackgroundScroll(Character &player, Background &background, Platform *platforms[], int numPlatforms, Platform &platform)
+{
     float scrollSpeed = 0.0f;
 
-    if (player.posY < windowHeight / 2 - 100) {
+    if (player.posY < windowHeight / 2 - 100)
+    {
         scrollSpeed = +5.0f;
-    } else if (player.posY > windowHeight / 2 + 50 && background.bgY1 > 15) {
+    }
+    else if (player.posY > windowHeight / 2 + 170 && background.bgY1 > 15)
+    {
         scrollSpeed = -15.0f;
-        player.posY = background.bgY1+windowHeight;
     }
 
     background.bgY1 += scrollSpeed;
-    
-    for (int i = 0; i < numPlatforms; i++) {
+
+    for (int i = 0; i < numPlatforms; i++)
+    {
         platforms[i]->posY += scrollSpeed;
     }
 
@@ -77,14 +80,15 @@ void BackgroundScroll(Character &player, Background &background, Platform* platf
 }
 
 int main()
-{   
-    //Timer
-    if (deathStartTime == 1) deathStartTime = GetTime();
+{
+    // Timer
+    if (deathStartTime == 1)
+        deathStartTime = GetTime();
 
     InitWindow(windowWidth, windowHeight, "JumpJump");
     InitAudioDevice();
 
-    Character player("Character/character.png", 16, 16, 0, 1, 1, windowWidth / 2, windowHeight / 2 - 13, 6.0f, false);
+    Character player("Character/character.png", 16, 16, 0, 1, 1, windowWidth / 2, windowHeight / 2 - 13, 6.0f, false, 0, 0);
 
     Platform platform("Pads/PNG/Pad_1_1.png", windowWidth / 2, windowHeight / 2 + 87, 0.25f, 394 * 0.25f);
 
@@ -104,12 +108,7 @@ int main()
         "Background/PNG/Game_Background_1/Layers/Decor.png",
         "Background/PNG/Game_Background_1/Layers/Clouds.png",
         "Background/PNG/Game_Background_1/Layers/BackGround.png",
-        0.0f                                                    );
-
-    /* // Initialize Camera2D
-    Camera2D camera = {0};
-    camera.offset.y = windowHeight / 2;
-    camera.zoom = 1.0f; */
+        0.0f);
 
     SetTargetFPS(60);
 
@@ -121,28 +120,15 @@ int main()
         player.update(deltaTime);
         player.move(deltaTime, windowWidth);
         player.jump(deltaTime, windowHeight);
+        player.fall(deltaTime);
         BackgroundScroll(player, background, platforms, 10, platform);
 
         BeginDrawing();
         ClearBackground(WHITE);
 
-        /* // Begin camera mode
-        BeginMode2D(camera); */
-
         // Draw game world
         background.draw(windowHeight);
         platform.draw();
-
-        /* camera.target.x = 0;
-        if (player.posY < windowHeight / 2)
-        {
-            camera.target.y = (float){player.posY};  // Update camera to follow the player
-        }
-        else if (player.posY -100 > windowHeight/2)
-        {   
-            camera.target.y = windowHeight/2;
-            death(player, windowWidth, windowHeight);
-        } */
 
         // draw platforms
         for (int i = 0; i < 10; i++)
@@ -166,16 +152,17 @@ int main()
 
         LandOnPlatform(player, platformCollisionRec);
 
-        if (player.posY -100 > windowHeight/2) {
+        // death when falling longer than 2 sek
+        if (player.fallTime > 2.0f)
+        {
             death(player, windowWidth, windowHeight);
         }
 
+        DrawText(TextFormat("Fall Time: %.2f", player.fallTime), 10, 10, 20, BLACK);
         player.draw();
         background.drawDecor(windowHeight);
 
-        /* // End camera mode
-        EndMode2D(); */
-
+        DrawText(TextFormat("Velocity: %02i", player.velocity), 20, 100, 40, BLACK);
         DrawText(TextFormat("Time: %02i", (int)GetTime()), 20, 30, 20, GRAY);
         DrawText(TextFormat("deaths: %02i", deaths), 20, 50, 20, GRAY);
 

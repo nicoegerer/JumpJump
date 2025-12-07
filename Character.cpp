@@ -1,7 +1,7 @@
 #include "Character.h"
 
 // Constructor implementation
-Character::Character(const char *filename, int spriteWidth, int spriteHeight, int spriteRow, int spriteCount, int spritesPerSecond, float posX, float posY, float scale, bool isJumping)
+Character::Character(const char *filename, int spriteWidth, int spriteHeight, int spriteRow, int spriteCount, int spritesPerSecond, float posX, float posY, float scale, bool isJumping, int velocity, float fallTime)
 {
     texture = LoadTexture(filename);
     this->spriteWidth = spriteWidth;
@@ -13,6 +13,8 @@ Character::Character(const char *filename, int spriteWidth, int spriteHeight, in
     this->posY = posY;
     this->scale = scale;
     this->isJumping = isJumping;
+    this->velocity = velocity;
+    this->fallTime = fallTime;
 
     // Load jump sounds
     jumpSounds[0] = LoadSound("JumpSounds/sound1.wav");
@@ -38,6 +40,13 @@ void Character::move(float deltaTime, int windowWidth)
     }
 }
 
+    void Character::fall(float deltaTime) {
+        if (velocity < 0) { // Falling
+            fallTime += deltaTime;
+        } else { // standing
+            fallTime = 0;
+        }
+    }
 
 void Character::jump(float deltaTime, int windowHeight)
 {   
@@ -55,14 +64,12 @@ void Character::jump(float deltaTime, int windowHeight)
         int randomIndex = GetRandomValue(0, 5);
         PlaySound(jumpSounds[randomIndex]); 
 
-        velocity = -20;
+        velocity = 20;
         isJumping = true; // Set jumping state
     }
-
-    posY += velocity; // Apply jump velocity
-    velocity += 1;    // Gravity effect
+    posY -= velocity; // Apply jump velocity
+    velocity -= 1;    // Gravity effect
 }
-
 // Draw the character with animation
 void Character::draw() {
     int spriteIndex = (int)(GetTime() * spritesPerSecond) % spriteCount; // Select sprite frame
