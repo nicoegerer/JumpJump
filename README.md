@@ -1,1 +1,1 @@
-http://nicoegerer.de/JumpJump/
+https://nico-cpp1.github.io/JumpJump/Web/
