@@ -98,7 +98,7 @@ void Character::update(float deltaTime, bool isDead)
         facingLeft = IsKeyDown(KEY_A);
         idleTimer = 0.0;
     }
-    else if (isJumping && isDead)
+    else if (isJumping && !isDead)
     {
         // jump
         spriteRow = 5;
