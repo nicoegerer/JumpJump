@@ -1,6 +1,21 @@
-:: cd C:\raylib\emsdk
-:: .\emsdk_env.ps1
+@echo off
 
+REM --- Emscripten Environment laden ---
+call "C:\raylib\emsdk\emsdk_env.bat"
 
-emcc main.cpp Background.cpp Platform.cpp Character.cpp -Wall -std=c++14 -D_DEFAULT_SOURCE -Wno-missing-braces -Wunused-result -Os -I. -I C:/raylib/raylib/src -I C:/raylib/raylib/src/external -L. -L C:/raylib/raylib/src -s USE_GLFW=3 -s ASYNCIFY -s TOTAL_MEMORY=67108864 -s FORCE_FILESYSTEM=1 --preload-file Background --preload-file Character --preload-file Pads C:/raylib/raylib/src/web/libraylib.a -DPLATFORM_WEB -s EXPORTED_FUNCTIONS="['_free','_malloc','_main']" -s EXPORTED_RUNTIME_METHODS=ccall -o C:/GameDev/Raylib/JumpJump/Web/index.js
+REM --- Projekt kompilieren ---
+emcc main.cpp Background.cpp Platform.cpp Character.cpp ^
+-Wall -std=c++14 -D_DEFAULT_SOURCE -Wno-missing-braces -Wunused-result -Os ^
+-I. -I C:/raylib/raylib/src -I C:/raylib/raylib/src/external ^
+-L. -L C:/raylib/raylib/src ^
+-s USE_GLFW=3 -s ASYNCIFY -s TOTAL_MEMORY=67108864 -s FORCE_FILESYSTEM=1 ^
+--preload-file Background --preload-file Character --preload-file Pads ^
+C:/raylib/raylib/src/web/libraylib.a ^
+-DPLATFORM_WEB ^
+-s EXPORTED_FUNCTIONS="['_free','_malloc','_main']" ^
+-s EXPORTED_RUNTIME_METHODS=ccall ^
+-o C:/GameDev/Raylib/JumpJump/Web/index.js
 
+echo.
+echo Build finished!
+pause

@@ -9,13 +9,7 @@
 		"**/*.exe": true,
 	},
 	"cSpell.words": [
-		"Contex",
-		"Egerer",
-		"emscripten",
-		"github",
-		"Nico",
-		"spacebar",
-		"webglcontextlost"
+
 	],
 	"files.associations": {
 		"random": "cpp"

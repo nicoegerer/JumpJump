@@ -6,7 +6,7 @@
 class Character {
 public:
     // Constructor to initialize the character with a texture and sprite details
-    Character(const char* filename, int spriteWidth, int spriteHeight, int spriteRow, int spriteCount, int spritesPerSecond, float posX, float posY, float scale, bool isJumping, int velocity, float fallTime);
+    Character(const char* filename, int spriteWidth, int spriteHeight, int spriteRow, int spriteCount, int spritesPerSecond, float posX, float posY, float scale, bool isJumping, int velocity, bool onGround);
 
     // Function to update the character's movement
     void move(float deltaTime, int windowWidth);
@@ -14,13 +14,13 @@ public:
     // Function to draw the character on the screen
     void draw();
 
-    void update(float deltaTime);
+    void update(float deltaTime, bool isDead);
 
     void jump(float deltaTime, int windowHeight);
 
     void unload();
 
-    void fall(float deltaTime);
+    void fall(int windowHeight);
 
     bool isDead();
 
@@ -39,7 +39,7 @@ public:
     int velocity = 0;
     int sprite_size = spriteHeight * scale; // Size of the sprite
     int border = 62;
-    float fallTime = 0;
+    bool onGround;
 
     Sound jumpSounds[7]; // Array of jump sounds
 

@@ -8,9 +8,11 @@ const int windowHeight = 960;
 float deathStartTime = 0;
 bool isDead = false;
 int deaths = 0;
+bool isPaused = false;
+float scrollSpeed = 2.5f;
 
 void death(Character &player, int windowWidth, int windowHeight)
-{
+{   
     if (!isDead)
     {
         deathStartTime = GetTime();
@@ -41,13 +43,11 @@ void LandOnPlatform(Character &player, Rectangle platform)
         player.posY + player.spriteHeight * player.scale - 10,
         player.spriteWidth * player.scale - 40,
         10};
-    DrawRectangleLinesEx(playerCollisionRec, 1, RED);
-    DrawRectangleLinesEx(platform, 1, RED);
+
     if (CheckCollisionRecs(playerCollisionRec, platform))
     {
-        bool fallingDown = player.velocity < 0;
-        bool abovePlatform = (player.posY + player.spriteHeight * player.scale + player.velocity) <= platform.y;
-        if (fallingDown && abovePlatform)
+        bool onPlatform = (player.posY + player.spriteHeight * player.scale + player.velocity) <= platform.y;
+        if (onPlatform)
         {
             player.isJumping = false;
             player.velocity = 0;
@@ -55,18 +55,20 @@ void LandOnPlatform(Character &player, Rectangle platform)
         }
     }
 }
-
 void BackgroundScroll(Character &player, Background &background, Platform *platforms[], int numPlatforms, Platform &platform)
-{
-    float scrollSpeed = 0.0f;
-
-    if (player.posY < windowHeight / 2 - 100)
+{   
+    if (!isDead && !isPaused)
     {
-        scrollSpeed = +5.0f;
+        scrollSpeed += 0.5f * GetFrameTime(); // dauerhafte Beschleunigung
     }
-    else if (player.posY > windowHeight / 2 + 170 && background.bgY1 > 15)
+    else if (isDead && background.bgY1 > 15.0f)
     {
         scrollSpeed = -15.0f;
+    }
+    else
+    {
+        scrollSpeed = 0.0f;
+        if (background.bgY1 < 15.0f) background.bgY1 = 15.0f;
     }
 
     background.bgY1 += scrollSpeed;
@@ -79,6 +81,8 @@ void BackgroundScroll(Character &player, Background &background, Platform *platf
     platform.posY += scrollSpeed;
 }
 
+
+
 int main()
 {
     // Timer
@@ -88,7 +92,7 @@ int main()
     InitWindow(windowWidth, windowHeight, "JumpJump");
     InitAudioDevice();
 
-    Character player("Character/character.png", 16, 16, 0, 1, 1, windowWidth / 2, windowHeight / 2 - 13, 6.0f, false, 0, 0);
+    Character player("Character/character.png", 16, 16, 0, 1, 1, windowWidth / 2, windowHeight / 2 - 13, 6.0f, false, 0, false);
 
     Platform platform("Pads/PNG/Pad_1_1.png", windowWidth / 2, windowHeight / 2 + 87, 0.25f, 394 * 0.25f);
 
@@ -117,10 +121,10 @@ int main()
         float deltaTime = GetFrameTime(); // Time since last frame
 
         // Update player
-        player.update(deltaTime);
+        player.update(deltaTime, isDead);
         player.move(deltaTime, windowWidth);
         player.jump(deltaTime, windowHeight);
-        player.fall(deltaTime);
+        player.fall(windowHeight);
         BackgroundScroll(player, background, platforms, 10, platform);
 
         BeginDrawing();
@@ -152,17 +156,21 @@ int main()
 
         LandOnPlatform(player, platformCollisionRec);
 
-        // death when falling longer than 2 sek
-        if (player.fallTime > 2.0f)
+        // death when falling
+        if (player.velocity < -30 || player.onGround)
         {
             death(player, windowWidth, windowHeight);
+        }   
+
+        if (IsKeyPressed(KEY_P))
+        {
+            isPaused = !isPaused;
         }
 
-        DrawText(TextFormat("Fall Time: %.2f", player.fallTime), 10, 10, 20, BLACK);
         player.draw();
         background.drawDecor(windowHeight);
 
-        DrawText(TextFormat("Velocity: %02i", player.velocity), 20, 100, 40, BLACK);
+        if (isPaused) DrawText("Pause", 125, 400, 100, GREEN);
         DrawText(TextFormat("Time: %02i", (int)GetTime()), 20, 30, 20, GRAY);
         DrawText(TextFormat("deaths: %02i", deaths), 20, 50, 20, GRAY);
 

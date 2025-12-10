@@ -1,7 +1,7 @@
 #include "Character.h"
 
 // Constructor implementation
-Character::Character(const char *filename, int spriteWidth, int spriteHeight, int spriteRow, int spriteCount, int spritesPerSecond, float posX, float posY, float scale, bool isJumping, int velocity, float fallTime)
+Character::Character(const char *filename, int spriteWidth, int spriteHeight, int spriteRow, int spriteCount, int spritesPerSecond, float posX, float posY, float scale, bool isJumping, int velocity, bool onGround)
 {
     texture = LoadTexture(filename);
     this->spriteWidth = spriteWidth;
@@ -14,7 +14,7 @@ Character::Character(const char *filename, int spriteWidth, int spriteHeight, in
     this->scale = scale;
     this->isJumping = isJumping;
     this->velocity = velocity;
-    this->fallTime = fallTime;
+    this->onGround = onGround;
 
     // Load jump sounds
     jumpSounds[0] = LoadSound("JumpSounds/sound1.wav");
@@ -40,25 +40,23 @@ void Character::move(float deltaTime, int windowWidth)
     }
 }
 
-    void Character::fall(float deltaTime) {
-        if (velocity < 0) { // Falling
-            fallTime += deltaTime;
-        } else { // standing
-            fallTime = 0;
+    void Character::fall(int windowHeight) {
+        
+        posY -= velocity; // Apply jump velocity
+        if (posY+spriteHeight*scale < windowHeight) {
+            velocity -= 1;    // Gravity effect
+            onGround = false;
+        } 
+        else {
+            velocity = 0;
+            posY = windowHeight - spriteHeight * scale;
+            onGround = true;
         }
     }
 
 void Character::jump(float deltaTime, int windowHeight)
 {   
-    int sprite_bottom = posY + sprite_size; // Bottom of the sprite
-
-    if (sprite_bottom >= windowHeight)
-    {
-        isJumping = false; // Reset jumping state
-        velocity = 0;
-    }
-
-    if (IsKeyPressed(KEY_SPACE) && !isJumping)
+    if (IsKeyPressed(KEY_SPACE) && !isJumping && !onGround)
     {   
         // Play a random jump sound
         int randomIndex = GetRandomValue(0, 5);
@@ -67,8 +65,6 @@ void Character::jump(float deltaTime, int windowHeight)
         velocity = 20;
         isJumping = true; // Set jumping state
     }
-    posY -= velocity; // Apply jump velocity
-    velocity -= 1;    // Gravity effect
 }
 // Draw the character with animation
 void Character::draw() {
@@ -90,7 +86,7 @@ void Character::draw() {
     DrawTexturePro(texture, spriteRec, spriteDest, origin, 0.0f, WHITE);
 }
 
-void Character::update(float deltaTime)
+void Character::update(float deltaTime, bool isDead)
 {
 
     if (!isJumping && (IsKeyDown(KEY_D) || IsKeyDown(KEY_A)))
@@ -102,7 +98,7 @@ void Character::update(float deltaTime)
         facingLeft = IsKeyDown(KEY_A);
         idleTimer = 0.0;
     }
-    else if (isJumping)
+    else if (isJumping && isDead)
     {
         // jump
         spriteRow = 5;
