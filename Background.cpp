@@ -1,6 +1,7 @@
 #include "Background.h"
 
-Background::Background(const char *texture_sky, const char *texture_sides, const char *texture_ground, const char *texture_decor, const char *texture_clouds, const char *texture_background, float bgY1) {
+Background::Background(const char *texture_sky, const char *texture_sides, const char *texture_ground, const char *texture_decor, const char *texture_clouds, const char *texture_background, float bgY1)
+{
     sky = LoadTexture(texture_sky);
     sides = LoadTexture(texture_sides);
     ground = LoadTexture(texture_ground);
@@ -11,14 +12,14 @@ Background::Background(const char *texture_sky, const char *texture_sides, const
 }
 
 void Background::draw(int windowHeight)
-{    
+{
     // Draw sky
     DrawTextureEx(sky, {0.0, bgY1}, 0.0f, 1.0f, WHITE);
-    DrawTextureEx(sky, {0.0, bgY1-windowHeight}, 0.0f, 1.0f, WHITE);
+    DrawTextureEx(sky, {0.0, bgY1 - windowHeight}, 0.0f, 1.0f, WHITE);
 
     // Draw Clouds
     DrawTextureEx(clouds, {0.0, bgY1}, 0.0f, 1.0f, WHITE);
-    DrawTextureEx(clouds, {0.0, bgY1-windowHeight}, 0.0f, 1.0f, WHITE);
+    DrawTextureEx(clouds, {0.0, bgY1 - windowHeight}, 0.0f, 1.0f, WHITE);
 
     // Draw BackGround
     DrawTextureEx(backGround, {0.0, 0.0}, 0.0f, 1.0f, WHITE);
@@ -30,14 +31,15 @@ void Background::draw(int windowHeight)
 
     // Draw sides
     DrawTextureEx(sides, {0.0, bgY1}, 0.0f, 1.0f, WHITE);
-    DrawTextureEx(sides, {0.0, bgY1-windowHeight}, 0.0f, 1.0f, WHITE);
+    DrawTextureEx(sides, {0.0, bgY1 - windowHeight}, 0.0f, 1.0f, WHITE);
 }
 
-void Background::drawDecor(int windowHeight) {
+void Background::drawDecor(int windowHeight)
+{
 
     // Draw Decor
     DrawTextureEx(decor, {0.0, bgY1}, 0.0f, 1.0f, WHITE);
-    DrawTextureEx(decor, {0.0, bgY1-windowHeight}, 0.0f, 1.0f, WHITE);
+    DrawTextureEx(decor, {0.0, bgY1 - windowHeight}, 0.0f, 1.0f, WHITE);
 }
 
 void Background::unload()

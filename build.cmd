@@ -9,12 +9,12 @@ emcc main.cpp Background.cpp Platform.cpp Character.cpp ^
 -I. -I C:/raylib/raylib/src -I C:/raylib/raylib/src/external ^
 -L. -L C:/raylib/raylib/src ^
 -s USE_GLFW=3 -s ASYNCIFY -s TOTAL_MEMORY=67108864 -s FORCE_FILESYSTEM=1 ^
---preload-file Background --preload-file Character --preload-file Pads ^
+--preload-file Background --preload-file Character --preload-file Pads --preload-file JumpSounds ^
 C:/raylib/raylib/src/web/libraylib.a ^
 -DPLATFORM_WEB ^
 -s EXPORTED_FUNCTIONS="['_free','_malloc','_main']" ^
 -s EXPORTED_RUNTIME_METHODS=ccall ^
--o C:/GameDev/Raylib/JumpJump/Web/index.js
+-o C:/Users/Nico.Egerer/GameDev/Raylib/JumpJump/Web/index.js
 
 echo.
 echo Build finished!
