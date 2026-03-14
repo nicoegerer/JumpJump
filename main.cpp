@@ -37,7 +37,7 @@ void death(Character &player, Platform &startPlatform)
     {
         DrawText("Restart? Press R", player.border + 5, windowHeight / 2 - 100, 45, RED);
 
-        if (IsKeyPressed(KEY_R))
+        if (IsKeyPressed(KEY_R) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON) || GetTouchPointCount() > 0)
         {
             player.posY = windowHeight / 2 - 50;
             player.posX = windowWidth / 2;
@@ -202,6 +202,22 @@ int main()
     {
         float deltaTime = GetFrameTime();
 
+        if (GetTouchPointCount() > 0)
+        {
+            Vector2 touch = GetTouchPosition(0);
+
+            if (touch.x < windowWidth / 2)
+                player.posX -= 200 * deltaTime;
+            else
+                player.posX += 200 * deltaTime;
+
+            if (!player.isJumping && !player.onGround)
+            {
+                player.velocity = 20;
+                player.isJumping = true;
+            }
+        }
+
         if (!isDead && !isPaused && gameStarted)
         {
             scoreTimer += deltaTime;
@@ -215,7 +231,7 @@ int main()
 
         if (!gameStarted)
         {
-            if (IsKeyPressed(KEY_ENTER))
+            if (IsKeyPressed(KEY_ENTER) || GetTouchPointCount() > 0)
             {
                 gameStarted = true;
                 lastSpeedIncrease = GetTime();
